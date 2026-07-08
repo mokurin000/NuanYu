@@ -1,5 +1,4 @@
 ﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/date_utils.dart' as du;
 import '../../../data/models/journal_entry.dart';
 import '../../../data/repositories/journal_repository.dart';
 

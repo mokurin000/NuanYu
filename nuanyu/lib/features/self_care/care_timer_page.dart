@@ -20,7 +20,6 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
   int _remainingSeconds = 0;
   int _totalSeconds = 0;
   bool _isRunning = false;
-  bool _isPaused = false;
   bool _isCompleted = false;
 
   @override
