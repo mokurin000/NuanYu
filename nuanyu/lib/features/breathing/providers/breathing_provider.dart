@@ -32,6 +32,7 @@ final breathingPatterns = [
     inhaleSeconds: 4,
     holdSeconds: 7,
     exhaleSeconds: 8,
+    postHoldSeconds: 0,
   ),
   const BreathingPattern(
     name: '4-4-4-4 方块呼吸',
@@ -47,6 +48,7 @@ final breathingPatterns = [
     inhaleSeconds: 6,
     holdSeconds: 0,
     exhaleSeconds: 2,
+    postHoldSeconds: 0,
   ),
   const BreathingPattern(
     name: '2-4-6-0 呼吸',
@@ -54,6 +56,7 @@ final breathingPatterns = [
     inhaleSeconds: 2,
     holdSeconds: 4,
     exhaleSeconds: 6,
+    postHoldSeconds: 0,
   ),
   const BreathingPattern(
     name: '7-4-8-4 调息法',
@@ -69,6 +72,7 @@ final breathingPatterns = [
     inhaleSeconds: 7,
     holdSeconds: 0,
     exhaleSeconds: 7,
+    postHoldSeconds: 0,
   ),
 ];
 
@@ -147,13 +151,17 @@ class BreathingNotifier extends Notifier<BreathingState> {
     switch (newPhase) {
       case BreathPhase.inhale:
         maxPhaseSeconds = pattern.inhaleSeconds;
-        nextPhase = BreathPhase.hold;
+
+        nextPhase = pattern.holdSeconds == 0
+            ? BreathPhase.exhale
+            : BreathPhase.hold;
+
       case BreathPhase.hold:
         maxPhaseSeconds = pattern.holdSeconds;
         nextPhase = BreathPhase.exhale;
       case BreathPhase.exhale:
         maxPhaseSeconds = pattern.exhaleSeconds;
-        nextPhase = pattern.postHoldSeconds != null
+        nextPhase = ((pattern.postHoldSeconds ?? 0) != 0)
             ? BreathPhase.rest
             : BreathPhase.inhale;
       case BreathPhase.rest:

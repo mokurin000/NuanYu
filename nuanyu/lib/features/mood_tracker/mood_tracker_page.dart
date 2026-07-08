@@ -25,9 +25,9 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final now = DateTime.now();
-      ref.read(moodProvider.notifier).selectDate(
-        DateTime(now.year, now.month, now.day),
-      );
+      ref
+          .read(moodProvider.notifier)
+          .selectDate(DateTime(now.year, now.month, now.day));
       _loadMonth(now);
     });
   }
@@ -56,9 +56,9 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(moodProvider);
     final entries = state.entries;
-    final dateEntries = entries.where(
-      (e) => e.date == du.formatDate(state.selectedDate),
-    ).toList();
+    final dateEntries = entries
+        .where((e) => e.date == du.formatDate(state.selectedDate))
+        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -78,7 +78,10 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      MoodIndicator(moodScore: dateEntries.first.moodScore, size: 40),
+                      MoodIndicator(
+                        moodScore: dateEntries.first.moodScore,
+                        size: 40,
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -95,7 +98,9 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
                             if (dateEntries.first.emotionLabel != null)
                               Text(
                                 dateEntries.first.emotionLabel!,
-                                style: const TextStyle(color: AppColors.textSecondary),
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                           ],
                         ),
@@ -117,38 +122,53 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
                     padding: const EdgeInsets.all(12),
                     child: Row(
                       children: [
-                        const Icon(Icons.trending_up, color: AppColors.primaryColor),
+                        const Icon(
+                          Icons.trending_up,
+                          color: AppColors.primaryColor,
+                        ),
                         const SizedBox(width: 8),
-                        const Text('查看情绪趋势', style: TextStyle(color: AppColors.textSecondary)),
+                        const Text(
+                          '查看情绪趋势',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
                         const Spacer(),
-                        const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                        const Icon(
+                          Icons.chevron_right,
+                          color: AppColors.textSecondary,
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
             ] else ...[
-              WarmCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.mood, size: 48, color: AppColors.textSecondary),
-                      const SizedBox(height: 12),
-                      const Text(
-                        '今天还没有记录',
-                        style: TextStyle(color: AppColors.textSecondary),
-                      ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () => _showRecordSheet(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: Colors.white,
+              Center(
+                child: WarmCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        const Icon(
+                          Icons.mood,
+                          size: 48,
+                          color: AppColors.textSecondary,
                         ),
-                        child: const Text('记录今日情绪'),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+                        const Text(
+                          '今天还没有记录',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () => _showRecordSheet(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('记录今日情绪'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -181,17 +201,19 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: ['一', '二', '三', '四', '五', '六', '日']
-                  .map((d) => SizedBox(
-                        width: 40,
-                        child: Text(
-                          d,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                          ),
+                  .map(
+                    (d) => SizedBox(
+                      width: 40,
+                      child: Text(
+                        d,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
                         ),
-                      ))
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
             const SizedBox(height: 8),
@@ -212,45 +234,58 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
               const Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(
-                  child: Text('暂无记录', style: TextStyle(color: AppColors.textSecondary)),
+                  child: Text(
+                    '暂无记录',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
                 ),
               )
             else
-              ...entries.take(10).map((entry) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: WarmCard(
-                      onTap: () => context.push('/mood/detail/${entry.id}'),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            MoodIndicator(moodScore: entry.moodScore),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${entry.date} ${entry.time}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                  if (entry.emotionLabel != null)
+              ...entries
+                  .take(10)
+                  .map(
+                    (entry) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: WarmCard(
+                        onTap: () => context.push('/mood/detail/${entry.id}'),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              MoodIndicator(moodScore: entry.moodScore),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Text(
-                                      entry.emotionLabel!,
-                                      style: const TextStyle(color: AppColors.textPrimary),
+                                      '${entry.date} ${entry.time}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
-                                ],
+                                    if (entry.emotionLabel != null)
+                                      Text(
+                                        entry.emotionLabel!,
+                                        style: const TextStyle(
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20),
-                          ],
+                              const Icon(
+                                Icons.chevron_right,
+                                color: AppColors.textSecondary,
+                                size: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  )),
+                  ),
           ],
         ),
       ),
@@ -278,7 +313,8 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
       final date = DateTime(_currentMonth.year, _currentMonth.month, day);
       final dateStr = du.formatDate(date);
       final dayEntries = entries.where((e) => e.date == dateStr).toList();
-      final isSelected = date.year == state.selectedDate.year &&
+      final isSelected =
+          date.year == state.selectedDate.year &&
           date.month == state.selectedDate.month &&
           date.day == state.selectedDate.day;
 
@@ -292,7 +328,9 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isSelected ? AppColors.primaryColor.withValues(alpha: 0.2) : null,
+              color: isSelected
+                  ? AppColors.primaryColor.withValues(alpha: 0.2)
+                  : null,
               border: Border.all(
                 color: isSelected ? AppColors.primaryColor : Colors.transparent,
                 width: 1.5,
@@ -305,8 +343,12 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
                   '$day',
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? AppColors.primaryColor : AppColors.textPrimary,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: isSelected
+                        ? AppColors.primaryColor
+                        : AppColors.textPrimary,
                   ),
                 ),
                 if (dayEntries.isNotEmpty)
@@ -328,11 +370,7 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
       );
     }
 
-    return Wrap(
-      spacing: 0,
-      runSpacing: 4,
-      children: cells,
-    );
+    return Wrap(spacing: 0, runSpacing: 4, children: cells);
   }
 
   void _showRecordSheet(BuildContext context) {
@@ -344,5 +382,3 @@ class _MoodTrackerPageState extends ConsumerState<MoodTrackerPage> {
     );
   }
 }
-
-

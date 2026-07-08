@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import 'providers/breathing_provider.dart';
@@ -27,6 +28,7 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
   void initState() {
     super.initState();
     _soLoud = SoLoud.instance;
+    WakelockPlus.enable();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _initAudio();
       ref.read(breathingProvider.notifier).startSession();
@@ -67,6 +69,7 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
   void dispose() {
     _timer?.cancel();
     _soLoud.deinit();
+    WakelockPlus.disable();
     super.dispose();
   }
 
@@ -210,12 +213,14 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
   }
 
   double _phaseDuration(BreathPhase phase, BreathingPattern pattern) {
-    return switch (phase) {
+    final duration = switch (phase) {
       BreathPhase.inhale => pattern.inhaleSeconds.toDouble(),
       BreathPhase.hold => pattern.holdSeconds.toDouble(),
       BreathPhase.exhale => pattern.exhaleSeconds.toDouble(),
       BreathPhase.rest => (pattern.postHoldSeconds ?? 0).toDouble(),
     };
+    // Guard against division by zero for zero-second phases
+    return duration == 0 ? 1.0 : duration;
   }
 }
 

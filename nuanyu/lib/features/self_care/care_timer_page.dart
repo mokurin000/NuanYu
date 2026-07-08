@@ -1,9 +1,11 @@
 ﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/services/notification_service.dart';
 import 'providers/self_care_provider.dart';
 
 class CareTimerPage extends ConsumerStatefulWidget {
@@ -17,6 +19,9 @@ class CareTimerPage extends ConsumerStatefulWidget {
 
 class _CareTimerPageState extends ConsumerState<CareTimerPage> {
   Timer? _timer;
+  late final SoLoud _alarmSoLoud;
+  AudioSource? _alarmSource;
+  bool _alarmReady = false;
   int _remainingSeconds = 0;
   int _totalSeconds = 0;
   bool _isRunning = false;
@@ -25,6 +30,8 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
   @override
   void initState() {
     super.initState();
+    _alarmSoLoud = SoLoud.instance;
+    _initAlarm();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final items = ref.read(selfCareProvider).items;
       final item = items.where((i) => i.id == widget.itemId).firstOrNull;
@@ -37,24 +44,48 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
     });
   }
 
+  Future<void> _initAlarm() async {
+    await _alarmSoLoud.init();
+    _alarmSource = await _alarmSoLoud.loadAsset('assets/ding.mp3');
+    _alarmReady = true;
+  }
+
+  void _playAlarm() {
+    if (_alarmReady && _alarmSource != null) {
+      _alarmSoLoud.play(_alarmSource!);
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    _alarmSoLoud.deinit();
     super.dispose();
   }
 
   void _start() {
     setState(() => _isRunning = true);
     HapticFeedback.lightImpact();
+    NotificationService().showCareTimerNotification(
+      remainingSeconds: _remainingSeconds,
+      totalSeconds: _totalSeconds,
+    );
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
         if (_remainingSeconds > 0) {
           _remainingSeconds--;
+          NotificationService().updateCareTimerProgress(
+            remainingSeconds: _remainingSeconds,
+            totalSeconds: _totalSeconds,
+          );
         } else {
           _timer?.cancel();
           _isRunning = false;
           _isCompleted = true;
           HapticFeedback.heavyImpact();
+          _playAlarm();
+          NotificationService().cancelCareTimerNotification();
+          NotificationService().showCareTimerCompleteNotification();
         }
       });
     });
@@ -63,6 +94,7 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
   void _pause() {
     _timer?.cancel();
     setState(() => _isRunning = false);
+    NotificationService().cancelCareTimerNotification();
   }
 
   void _reset() {
@@ -72,6 +104,7 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
       _isRunning = false;
       _isCompleted = false;
     });
+    NotificationService().cancelCareTimerNotification();
   }
 
   void _markComplete() {
@@ -119,9 +152,13 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                       child: CircularProgressIndicator(
                         value: 1 - _progress,
                         strokeWidth: 8,
-                        backgroundColor: AppColors.secondaryColor.withValues(alpha: 0.3),
+                        backgroundColor: AppColors.secondaryColor.withValues(
+                          alpha: 0.3,
+                        ),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          _isCompleted ? AppColors.moodGreat : AppColors.primaryColor,
+                          _isCompleted
+                              ? AppColors.moodGreat
+                              : AppColors.primaryColor,
                         ),
                       ),
                     ),
@@ -133,13 +170,19 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w300,
-                            color: _isCompleted ? AppColors.moodGreat : AppColors.textPrimary,
+                            color: _isCompleted
+                                ? AppColors.moodGreat
+                                : AppColors.textPrimary,
                           ),
                         ),
                         if (!_isCompleted)
                           Text(
-                            _isRunning ? '进行中' : (_totalSeconds > 0 ? '准备开始' : ''),
-                            style: const TextStyle(color: AppColors.textSecondary),
+                            _isRunning
+                                ? '进行中'
+                                : (_totalSeconds > 0 ? '准备开始' : ''),
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                       ],
                     ),
@@ -156,23 +199,22 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 48,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   )
                 else
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _CircleButton(
-                        icon: Icons.pause,
-                        onPressed: _pause,
-                      ),
+                      _CircleButton(icon: Icons.pause, onPressed: _pause),
                       const SizedBox(width: 24),
-                      _CircleButton(
-                        icon: Icons.stop,
-                        onPressed: _reset,
-                      ),
+                      _CircleButton(icon: Icons.stop, onPressed: _reset),
                     ],
                   ),
               ],
@@ -184,8 +226,13 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.moodGreat,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 48,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               const Spacer(),

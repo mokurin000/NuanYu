@@ -1,2 +1,3 @@
 -keep class androidx.lifecycle.DefaultLifecycleObserver
 -keep class com.mr.flutter.plugin.filepicker.** { *; }
+-keep class com.dexterous.flutterlocalnotifications.ForegroundService
