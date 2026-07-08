@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import 'providers/breathing_provider.dart';
@@ -16,14 +17,29 @@ class BreathingSession extends ConsumerStatefulWidget {
 
 class _BreathingSessionState extends ConsumerState<BreathingSession> {
   Timer? _timer;
+  late final SoLoud _soLoud;
+  AudioSource? _inhaleSource;
+  AudioSource? _holdSource;
+  AudioSource? _exhaleSource;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _soLoud = SoLoud.instance;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _initAudio();
       ref.read(breathingProvider.notifier).startSession();
       _startTimer();
     });
+  }
+
+  Future<void> _initAudio() async {
+    await _soLoud.init();
+    _inhaleSource = await _soLoud.loadAsset('assets/laura_inhale.mp3');
+    _holdSource = await _soLoud.loadAsset('assets/laura_hold.mp3');
+    _exhaleSource = await _soLoud.loadAsset('assets/laura_exhale.mp3');
+    _initialized = true;
   }
 
   void _startTimer() {
@@ -35,62 +51,61 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
     });
   }
 
+  void _playPhaseSound(BreathPhase phase) {
+    if (!_initialized) return;
+    final source = switch (phase) {
+      BreathPhase.inhale => _inhaleSource,
+      BreathPhase.hold || BreathPhase.rest => _holdSource,
+      BreathPhase.exhale => _exhaleSource,
+    };
+    if (source != null) {
+      _soLoud.play(source);
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    _soLoud.deinit();
     super.dispose();
   }
 
   String _phaseText(BreathPhase phase) {
-    switch (phase) {
-      case BreathPhase.inhale:
-        return '吸气';
-      case BreathPhase.hold:
-        return '屏息';
-      case BreathPhase.exhale:
-        return '呼气';
-      case BreathPhase.rest:
-        return '屏息';
-    }
+    return switch (phase) {
+      BreathPhase.inhale => '吸气',
+      BreathPhase.hold || BreathPhase.rest => '屏息',
+      BreathPhase.exhale => '呼气',
+    };
   }
 
   String _phaseInstruction(BreathPhase phase) {
-    switch (phase) {
-      case BreathPhase.inhale:
-        return '缓缓吸入...';
-      case BreathPhase.hold:
-        return '轻轻屏住...';
-      case BreathPhase.exhale:
-        return '慢慢呼出...';
-      case BreathPhase.rest:
-        return '自然停顿...';
-    }
+    return switch (phase) {
+      BreathPhase.inhale => '缓缓吸入...',
+      BreathPhase.hold => '轻轻屏住...',
+      BreathPhase.exhale => '慢慢呼出...',
+      BreathPhase.rest => '自然停顿...',
+    };
   }
 
   Color _phaseColor(BreathPhase phase) {
-    switch (phase) {
-      case BreathPhase.inhale:
-        return AppColors.primaryColor;
-      case BreathPhase.hold:
-        return AppColors.accentColor;
-      case BreathPhase.exhale:
-        return AppColors.secondaryColor;
-      case BreathPhase.rest:
-        return AppColors.moodMedium;
-    }
+    return switch (phase) {
+      BreathPhase.inhale => AppColors.primaryColor,
+      BreathPhase.hold => AppColors.accentColor,
+      BreathPhase.exhale => AppColors.secondaryColor,
+      BreathPhase.rest => AppColors.moodMedium,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(breathingProvider);
     final pattern = state.selectedPattern!;
-    final phaseProgress = state.phaseSeconds /
-        _phaseDuration(state.currentPhase, pattern);
+    final phaseProgress =
+        state.phaseSeconds / _phaseDuration(state.currentPhase, pattern);
 
-    // Trigger haptic on phase transitions
     if (state.phaseSeconds == 0 && state.sessionState == SessionState.running) {
       HapticFeedback.heavyImpact();
-      SystemSound.play(SystemSoundType.click);
+      _playPhaseSound(state.currentPhase);
     }
 
     return Scaffold(
@@ -111,7 +126,6 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
         child: Column(
           children: [
             const Spacer(flex: 1),
-            // Phase indicator
             Text(
               _phaseText(state.currentPhase),
               style: TextStyle(
@@ -146,7 +160,6 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
               ),
             ),
             const Spacer(flex: 1),
-            // Breathing animation
             SizedBox(
               height: 280,
               child: BreathingAnimation(
@@ -156,7 +169,6 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
               ),
             ),
             const Spacer(flex: 2),
-            // Controls
             Padding(
               padding: const EdgeInsets.all(24),
               child: Row(
@@ -198,16 +210,12 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
   }
 
   double _phaseDuration(BreathPhase phase, BreathingPattern pattern) {
-    switch (phase) {
-      case BreathPhase.inhale:
-        return pattern.inhaleSeconds.toDouble();
-      case BreathPhase.hold:
-        return pattern.holdSeconds.toDouble();
-      case BreathPhase.exhale:
-        return pattern.exhaleSeconds.toDouble();
-      case BreathPhase.rest:
-        return (pattern.postHoldSeconds ?? 0).toDouble();
-    }
+    return switch (phase) {
+      BreathPhase.inhale => pattern.inhaleSeconds.toDouble(),
+      BreathPhase.hold => pattern.holdSeconds.toDouble(),
+      BreathPhase.exhale => pattern.exhaleSeconds.toDouble(),
+      BreathPhase.rest => (pattern.postHoldSeconds ?? 0).toDouble(),
+    };
   }
 }
 
@@ -252,4 +260,3 @@ class _ControlButton extends StatelessWidget {
     );
   }
 }
-
