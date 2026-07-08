@@ -114,11 +114,11 @@ description: "Task list for 暖屿 (NuanYu) — CPTSD 自我管理 Flutter 应�
 
 ### Implementation for User Story 3
 
-- [ ] T041 [US3] Create SelfCareProvider (Riverpod) in `nuanyu/lib/features/self_care/providers/self_care_provider.dart` — state: items list, daily affirmation; actions: loadItems, addItem, updateItem, deleteItem, toggleCompletedToday, resetDailyCompletions (date-change logic); seed 6 preset care items (喝水, 散步, 感恩, 听歌, 浇花, 深呼吸)
-- [ ] T042 [US3] Create SelfCarePage in `nuanyu/lib/features/self_care/self_care_page.dart` — list of care items with checkbox (今日完成), item title + duration, swipe-to-delete, FAB to add new, daily affirmation banner at top
-- [ ] T043 [US3] Create AddCareItemPage in `nuanyu/lib/features/self_care/add_care_item_page.dart` — form: title, description (optional), duration_minutes picker (5-60 min stepper), save button
-- [ ] T044 [US3] Create CareTimerPage in `nuanyu/lib/features/self_care/care_timer_page.dart` — countdown timer with circular progress, pause/resume, completion celebration with HapticFeedback, "标记完成" button
-- [ ] T045 [US3] Create DailyAffirmation widget in `nuanyu/lib/features/self_care/daily_affirmation.dart` — random affirmation from 12 presets (Chinese warm affirmations), refreshes daily, warm card styling
+- [X] T041 [US3] Create SelfCareProvider (Riverpod) in `nuanyu/lib/features/self_care/providers/self_care_provider.dart` — state: items list, daily affirmation; actions: loadItems, addItem, updateItem, deleteItem, toggleCompletedToday, resetDailyCompletions (date-change logic); seed 6 preset care items (喝水, 散步, 感恩, 听歌, 浇花, 深呼吸)
+- [X] T042 [US3] Create SelfCarePage in `nuanyu/lib/features/self_care/self_care_page.dart` — list of care items with checkbox (今日完成), item title + duration, swipe-to-delete, FAB to add new, daily affirmation banner at top
+- [X] T043 [US3] Create AddCareItemPage in `nuanyu/lib/features/self_care/add_care_item_page.dart` — form: title, description (optional), duration_minutes picker (5-60 min stepper), save button
+- [X] T044 [US3] Create CareTimerPage in `nuanyu/lib/features/self_care/care_timer_page.dart` — countdown timer with circular progress, pause/resume, completion celebration with HapticFeedback, "标记完成" button
+- [X] T045 [US3] Create DailyAffirmation widget in `nuanyu/lib/features/self_care/daily_affirmation.dart` — random affirmation from 12 presets (Chinese warm affirmations), refreshes daily, warm card styling
 
 **Checkpoint**: Self care fully functional — CRUD items, daily check-off, guided timer, daily affirmations.
 
@@ -132,10 +132,10 @@ description: "Task list for 暖屿 (NuanYu) — CPTSD 自我管理 Flutter 应�
 
 ### Implementation for User Story 4
 
-- [ ] T046 [US4] Create JournalProvider (Riverpod) in `nuanyu/lib/features/journal/providers/journal_provider.dart` — state: entries grouped by date, selectedEntry; actions: loadAll (grouped), getById, addEntry, updateEntry, deleteEntry; integrate JournalRepository
-- [ ] T047 [US4] Create JournalListPage in `nuanyu/lib/features/journal/journal_list_page.dart` — entries grouped by date sections with headers, each entry showing preview text + mood color dot + time, FAB to add new
-- [ ] T048 [US4] Create JournalEditPage in `nuanyu/lib/features/journal/journal_edit_page.dart` — full-screen text editor, optional mood score picker (1-10), save with auto date/time, back-confirm discard dialog
-- [ ] T049 [US4] Create JournalDetailPage in `nuanyu/lib/features/journal/journal_detail_page.dart` — read-only rich view of entry: full content, mood indicator, date/time, edit button (navigates to edit page), delete with confirmation dialog
+- [X] T046 [US4] Create JournalProvider (Riverpod) in `nuanyu/lib/features/journal/providers/journal_provider.dart` — state: entries grouped by date, selectedEntry; actions: loadAll (grouped), getById, addEntry, updateEntry, deleteEntry; integrate JournalRepository
+- [X] T047 [US4] Create JournalListPage in `nuanyu/lib/features/journal/journal_list_page.dart` — entries grouped by date sections with headers, each entry showing preview text + mood color dot + time, FAB to add new
+- [X] T048 [US4] Create JournalEditPage in `nuanyu/lib/features/journal/journal_edit_page.dart` — full-screen text editor, optional mood score picker (1-10), save with auto date/time, back-confirm discard dialog
+- [X] T049 [US4] Create JournalDetailPage in `nuanyu/lib/features/journal/journal_detail_page.dart` — read-only rich view of entry: full content, mood indicator, date/time, edit button (navigates to edit page), delete with confirmation dialog
 
 **Checkpoint**: Journal fully functional — create, read, update, delete entries with date grouping and mood association.
 
@@ -260,6 +260,8 @@ US5 设置 requires all repositories, so it runs after all US1–US4.
 - Default app language: 简体中文 (hardcoded strings, no i18n)
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
+
+
 
 
 

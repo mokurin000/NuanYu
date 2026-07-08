@@ -10,6 +10,8 @@ import 'features/self_care/self_care_page.dart';
 import 'features/self_care/add_care_item_page.dart';
 import 'features/self_care/care_timer_page.dart';
 import 'features/journal/journal_list_page.dart';
+import 'features/journal/journal_edit_page.dart';
+import 'features/journal/journal_detail_page.dart';
 import 'settings/settings_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -94,6 +96,24 @@ final goRouter = GoRouter(
             GoRoute(
               path: '/journal',
               builder: (context, state) => const JournalListPage(),
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  builder: (context, state) => const JournalEditPage(),
+                ),
+                GoRoute(
+                  path: 'edit/:entryId',
+                  builder: (context, state) => JournalEditPage(
+                    existingEntry: null,
+                  ),
+                ),
+                GoRoute(
+                  path: 'detail/:entryId',
+                  builder: (context, state) => JournalDetailPage(
+                    entryId: state.pathParameters['entryId']!,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -150,6 +170,8 @@ class ScaffoldWithNavBar extends StatelessWidget {
     );
   }
 }
+
+
 
 
 
