@@ -51,6 +51,7 @@ class NotificationService {
   }
 
   Future<void> showCareTimerNotification({
+    required String title,
     required int remainingSeconds,
     required int totalSeconds,
   }) async {
@@ -87,18 +88,20 @@ class NotificationService {
 
     await _plugin.show(
       id: _careTimerNotificationId,
-      title: '关怀计时器',
+      title: title,
       body: '剩余时间: $timeText',
       notificationDetails: details,
     );
   }
 
   Future<void> updateCareTimerProgress({
+    required String title,
     required int remainingSeconds,
     required int totalSeconds,
   }) async {
     if (!_initialized) return;
     await showCareTimerNotification(
+      title: title,
       remainingSeconds: remainingSeconds,
       totalSeconds: totalSeconds,
     );
@@ -109,7 +112,9 @@ class NotificationService {
     await _plugin.cancel(id: _careTimerNotificationId);
   }
 
-  Future<void> showCareTimerCompleteNotification() async {
+  Future<void> showCareTimerCompleteNotification({
+    required String title,
+  }) async {
     if (!_initialized) await init();
 
     const androidDetails = AndroidNotificationDetails(
@@ -136,7 +141,7 @@ class NotificationService {
 
     await _plugin.show(
       id: _careTimerNotificationId,
-      title: '关怀计时器',
+      title: title,
       body: '计时完成！',
       notificationDetails: details,
     );

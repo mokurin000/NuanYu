@@ -26,6 +26,7 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
         // running or paused, it preserves the live countdown.
         ref.read(careTimerProvider.notifier).init(
           widget.itemId,
+          item.title,
           item.durationMinutes * 60,
         );
       }
