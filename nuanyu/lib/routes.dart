@@ -7,6 +7,8 @@ import 'features/mood_tracker/mood_tracker_page.dart';
 import 'features/mood_tracker/mood_detail_page.dart';
 import 'features/mood_tracker/mood_trend_chart.dart';
 import 'features/self_care/self_care_page.dart';
+import 'features/self_care/add_care_item_page.dart';
+import 'features/self_care/care_timer_page.dart';
 import 'features/journal/journal_list_page.dart';
 import 'settings/settings_page.dart';
 
@@ -71,6 +73,18 @@ final goRouter = GoRouter(
             GoRoute(
               path: '/selfcare',
               builder: (context, state) => const SelfCarePage(),
+              routes: [
+                GoRoute(
+                  path: 'add',
+                  builder: (context, state) => const AddCareItemPage(),
+                ),
+                GoRoute(
+                  path: 'timer/:itemId',
+                  builder: (context, state) => CareTimerPage(
+                    itemId: state.pathParameters['itemId']!,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -136,5 +150,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
     );
   }
 }
+
 
 

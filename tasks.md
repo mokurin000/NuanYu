@@ -96,11 +96,11 @@ description: "Task list for 暖屿 (NuanYu) — CPTSD 自我管理 Flutter 应�
 
 ### Implementation for User Story 2
 
-- [ ] T036 [US2] Create MoodProvider (Riverpod) in `nuanyu/lib/features/mood_tracker/providers/mood_provider.dart` — state: entries list (filtered by selected date/week/month), selectedDate; actions: loadByDate, loadByDateRange, addEntry, updateEntry, deleteEntry; integrate MoodRepository
-- [ ] T037 [US2] Create MoodTrackerPage in `nuanyu/lib/features/mood_tracker/mood_tracker_page.dart` — monthly calendar grid with mood-color dots per day, tap day to view/add entry, today summary card at top
-- [ ] T038 [US2] Create MoodRecordSheet in `nuanyu/lib/features/mood_tracker/mood_record_sheet.dart` — bottom sheet: mood score slider 1-10 (with color gradient), emotion label chip selector (14 presets), optional note TextField, save/cancel buttons
-- [ ] T039 [US2] Create MoodDetailPage in `nuanyu/lib/features/mood_tracker/mood_detail_page.dart` — read-only view of a single entry: score with color indicator, emotion label, note, date/time; edit/delete actions
-- [ ] T040 [US2] Create MoodTrendChart in `nuanyu/lib/features/mood_tracker/mood_trend_chart.dart` — fl_chart LineChart: x-axis dates, y-axis 1-10, color-coded line, week/month toggle, average mood line overlay
+- [X] T036 [US2] Create MoodProvider (Riverpod) in `nuanyu/lib/features/mood_tracker/providers/mood_provider.dart` — state: entries list (filtered by selected date/week/month), selectedDate; actions: loadByDate, loadByDateRange, addEntry, updateEntry, deleteEntry; integrate MoodRepository
+- [X] T037 [US2] Create MoodTrackerPage in `nuanyu/lib/features/mood_tracker/mood_tracker_page.dart` — monthly calendar grid with mood-color dots per day, tap day to view/add entry, today summary card at top
+- [X] T038 [US2] Create MoodRecordSheet in `nuanyu/lib/features/mood_tracker/mood_record_sheet.dart` — bottom sheet: mood score slider 1-10 (with color gradient), emotion label chip selector (14 presets), optional note TextField, save/cancel buttons
+- [X] T039 [US2] Create MoodDetailPage in `nuanyu/lib/features/mood_tracker/mood_detail_page.dart` — read-only view of a single entry: score with color indicator, emotion label, note, date/time; edit/delete actions
+- [X] T040 [US2] Create MoodTrendChart in `nuanyu/lib/features/mood_tracker/mood_trend_chart.dart` — fl_chart LineChart: x-axis dates, y-axis 1-10, color-coded line, week/month toggle, average mood line overlay
 
 **Checkpoint**: Mood tracking fully functional — record, browse history, view trend charts with week/month toggle.
 
@@ -260,5 +260,6 @@ US5 设置 requires all repositories, so it runs after all US1–US4.
 - Default app language: 简体中文 (hardcoded strings, no i18n)
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
+
 
 
