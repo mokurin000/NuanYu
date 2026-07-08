@@ -1,4 +1,4 @@
-﻿plugins {
+plugins {
     id("com.android.application")
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mokurin.nuanyu"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

@@ -149,9 +149,9 @@ description: "Task list for 暖屿 (NuanYu) — CPTSD 自我管理 Flutter 应�
 
 ### Implementation for User Story 5
 
-- [ ] T050 [US5] Create SettingsProvider (Riverpod) in `nuanyu/lib/settings/providers/settings_provider.dart` — state: exportStatus (idle/exporting/done/error); actions: exportAllData (aggregates all 4 repositories into JSON)
-- [ ] T051 [US5] Create JSON data export logic in `nuanyu/lib/core/utils/export_utils.dart` — aggregate mood_entries, symptom_records, journal_entries, self_care_items into structured JSON; write to Downloads directory via path_provider + dart:io; return file path
-- [ ] T052 [US5] Create SettingsPage in `nuanyu/lib/settings/settings_page.dart` — list tiles: 导出全部数据 (with status indicator), 关于暖屿 (app version, description), 生物验证锁 toggle (enable/disable)
+- [X] T050 [US5] Create SettingsProvider (Riverpod) in `nuanyu/lib/settings/providers/settings_provider.dart` — state: exportStatus (idle/exporting/done/error); actions: exportAllData (aggregates all 4 repositories into JSON)
+- [X] T051 [US5] Create JSON data export logic in `nuanyu/lib/core/utils/export_utils.dart` — aggregate mood_entries, symptom_records, journal_entries, self_care_items into structured JSON; write to Downloads directory via path_provider + dart:io; return file path
+- [X] T052 [US5] Create SettingsPage in `nuanyu/lib/settings/settings_page.dart` — list tiles: 导出全部数据 (with status indicator), 关于暖屿 (app version, description), 生物验证锁 toggle (enable/disable)
 
 **Checkpoint**: Settings accessible from breathing tab, JSON export works end-to-end.
 
@@ -161,12 +161,12 @@ description: "Task list for 暖屿 (NuanYu) — CPTSD 自我管理 Flutter 应�
 
 **Purpose**: Animations, visual polish, edge cases, and final build.
 
-- [ ] T053 [P] Add page transition animations in `nuanyu/lib/routes.dart` — fade and slide transitions for sub-routes (GoRouter page builders with CustomTransitionPage)
-- [ ] T054 [P] Polish empty-state illustrations and warm placeholder text across all 4 tab pages — update empty_state.dart usages in mood_tracker_page, self_care_page, journal_list_page
-- [ ] T055 [P] Refine micro-interactions: button press-scale feedback, card tap shadows, smooth scroll physics across all feature pages
-- [ ] T056 [P] Add daily reset logic — at app launch or date change, reset `is_completed_today` on all self_care_items in `nuanyu/lib/data/repositories/self_care_repository.dart`
-- [ ] T057 Final integration pass — verify all 4 tabs navigate correctly, data flows end-to-end, no console errors, warm theme consistent everywhere
-- [ ] T058 Build release APK — `flutter build apk --release` in nuanyu/, verify APK output
+- [X] T053 [P] Add page transition animations in `nuanyu/lib/routes.dart` — fade and slide transitions for sub-routes (GoRouter page builders with CustomTransitionPage)
+- [X] T054 [P] Polish empty-state illustrations and warm placeholder text across all 4 tab pages — update empty_state.dart usages in mood_tracker_page, self_care_page, journal_list_page
+- [X] T055 [P] Refine micro-interactions: button press-scale feedback, card tap shadows, smooth scroll physics across all feature pages
+- [X] T056 [P] Add daily reset logic — at app launch or date change, reset `is_completed_today` on all self_care_items in `nuanyu/lib/data/repositories/self_care_repository.dart`
+- [X] T057 Final integration pass — verify all 4 tabs navigate correctly, data flows end-to-end, no console errors, warm theme consistent everywhere
+- [X] T058 Build release APK — `flutter build apk --release` in nuanyu/, verify APK output
 
 ---
 
@@ -260,6 +260,7 @@ US5 设置 requires all repositories, so it runs after all US1–US4.
 - Default app language: 简体中文 (hardcoded strings, no i18n)
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
+
 
 
 

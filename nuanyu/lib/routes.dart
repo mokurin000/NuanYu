@@ -38,11 +38,23 @@ final goRouter = GoRouter(
               routes: [
                 GoRoute(
                   path: 'session',
-                  builder: (context, state) => const BreathingSession(),
+                  pageBuilder: (context, state) => CustomTransitionPage(
+                    key: state.pageKey,
+                    child: const BreathingSession(),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
                 ),
                 GoRoute(
                   path: 'complete',
-                  builder: (context, state) => const BreathingComplete(),
+                  pageBuilder: (context, state) => CustomTransitionPage(
+                    key: state.pageKey,
+                    child: const BreathingComplete(),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                  ),
                 ),
               ],
             ),
@@ -103,9 +115,7 @@ final goRouter = GoRouter(
                 ),
                 GoRoute(
                   path: 'edit/:entryId',
-                  builder: (context, state) => JournalEditPage(
-                    existingEntry: null,
-                  ),
+                  builder: (context, state) => const JournalEditPage(),
                 ),
                 GoRoute(
                   path: 'detail/:entryId',
@@ -170,8 +180,3 @@ class ScaffoldWithNavBar extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
