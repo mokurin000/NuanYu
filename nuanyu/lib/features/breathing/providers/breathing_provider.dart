@@ -21,19 +21,20 @@ class BreathingPattern {
     this.postHoldSeconds,
   });
 
-  int get totalSecondsPerCycle => inhaleSeconds + holdSeconds + exhaleSeconds + (postHoldSeconds ?? 0);
+  int get totalSecondsPerCycle =>
+      inhaleSeconds + holdSeconds + exhaleSeconds + (postHoldSeconds ?? 0);
 }
 
 final breathingPatterns = [
   const BreathingPattern(
-    name: '4-7-8 呼吸法',
+    name: '4-7-8-0 呼吸法',
     description: '放松身心，缓解焦虑',
     inhaleSeconds: 4,
     holdSeconds: 7,
     exhaleSeconds: 8,
   ),
   const BreathingPattern(
-    name: '方块呼吸',
+    name: '4-4-4-4 方块呼吸',
     description: '平静思绪，集中注意',
     inhaleSeconds: 4,
     holdSeconds: 4,
@@ -41,18 +42,33 @@ final breathingPatterns = [
     postHoldSeconds: 4,
   ),
   const BreathingPattern(
-    name: '4-4-4 呼吸',
-    description: '舒缓情绪，恢复平衡',
-    inhaleSeconds: 4,
-    holdSeconds: 4,
-    exhaleSeconds: 4,
+    name: '6-0-2-0 晨间呼吸',
+    description: '清晨唤醒，能量充沛',
+    inhaleSeconds: 6,
+    holdSeconds: 0,
+    exhaleSeconds: 2,
   ),
   const BreathingPattern(
-    name: '2-4-6 呼吸',
+    name: '2-4-6-0 呼吸',
     description: '放松入眠，深度休息',
     inhaleSeconds: 2,
     holdSeconds: 4,
     exhaleSeconds: 6,
+  ),
+  const BreathingPattern(
+    name: '7-4-8-4 调息法',
+    description: '瑜伽调息，心灵平静',
+    inhaleSeconds: 7,
+    holdSeconds: 4,
+    exhaleSeconds: 8,
+    postHoldSeconds: 4,
+  ),
+  const BreathingPattern(
+    name: '7-0-7-0 乌加依',
+    description: '释放烦躁，平静身心',
+    inhaleSeconds: 7,
+    holdSeconds: 0,
+    exhaleSeconds: 7,
   ),
 ];
 
@@ -92,7 +108,9 @@ class BreathingState {
   }
 }
 
-final breathingProvider = NotifierProvider<BreathingNotifier, BreathingState>(BreathingNotifier.new);
+final breathingProvider = NotifierProvider<BreathingNotifier, BreathingState>(
+  BreathingNotifier.new,
+);
 
 class BreathingNotifier extends Notifier<BreathingState> {
   @override
@@ -135,7 +153,9 @@ class BreathingNotifier extends Notifier<BreathingState> {
         nextPhase = BreathPhase.exhale;
       case BreathPhase.exhale:
         maxPhaseSeconds = pattern.exhaleSeconds;
-        nextPhase = pattern.postHoldSeconds != null ? BreathPhase.rest : BreathPhase.inhale;
+        nextPhase = pattern.postHoldSeconds != null
+            ? BreathPhase.rest
+            : BreathPhase.inhale;
       case BreathPhase.rest:
         maxPhaseSeconds = pattern.postHoldSeconds!;
         nextPhase = BreathPhase.inhale;
