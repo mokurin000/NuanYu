@@ -4,6 +4,8 @@ import 'features/breathing/breathing_page.dart';
 import 'features/breathing/breathing_session.dart';
 import 'features/breathing/breathing_complete.dart';
 import 'features/mood_tracker/mood_tracker_page.dart';
+import 'features/mood_tracker/mood_detail_page.dart';
+import 'features/mood_tracker/mood_trend_chart.dart';
 import 'features/self_care/self_care_page.dart';
 import 'features/journal/journal_list_page.dart';
 import 'settings/settings_page.dart';
@@ -48,6 +50,18 @@ final goRouter = GoRouter(
             GoRoute(
               path: '/mood',
               builder: (context, state) => const MoodTrackerPage(),
+              routes: [
+                GoRoute(
+                  path: 'detail/:entryId',
+                  builder: (context, state) => MoodDetailPage(
+                    entryId: state.pathParameters['entryId']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'trend',
+                  builder: (context, state) => const MoodTrendChart(),
+                ),
+              ],
             ),
           ],
         ),
@@ -122,4 +136,5 @@ class ScaffoldWithNavBar extends StatelessWidget {
     );
   }
 }
+
 
