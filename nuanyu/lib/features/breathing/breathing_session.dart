@@ -90,6 +90,7 @@ class _BreathingSessionState extends ConsumerState<BreathingSession> {
     // Trigger haptic on phase transitions
     if (state.phaseSeconds == 0 && state.sessionState == SessionState.running) {
       HapticFeedback.heavyImpact();
+      SystemSound.play(SystemSoundType.click);
     }
 
     return Scaffold(
@@ -251,3 +252,4 @@ class _ControlButton extends StatelessWidget {
     );
   }
 }
+
