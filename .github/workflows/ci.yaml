@@ -1,0 +1,21 @@
+name: 🛠 Build & Release
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - /assets/**/*
+      - /lib/**/*.dart
+      - /pubspec.yaml
+      - /pubspec.lock
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  android:
+    uses: ./.github/workflows/android.yaml
