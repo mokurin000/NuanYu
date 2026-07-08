@@ -17,7 +17,7 @@ android {
         applicationId = "com.mokurin.nuanyu"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        versionCode = 1
         versionName = flutter.versionName
     }
 
