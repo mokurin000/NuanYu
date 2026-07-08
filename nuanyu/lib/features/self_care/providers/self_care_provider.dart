@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/self_care_item.dart';
 import '../../../data/repositories/self_care_repository.dart';
 
-final selfCareRepositoryProvider = Provider<SelfCareRepository>((ref) => SelfCareRepository());
+final selfCareRepositoryProvider = Provider<SelfCareRepository>(
+  (ref) => SelfCareRepository(),
+);
 
-final selfCareProvider = NotifierProvider<SelfCareNotifier, SelfCareState>(SelfCareNotifier.new);
+final selfCareProvider = NotifierProvider<SelfCareNotifier, SelfCareState>(
+  SelfCareNotifier.new,
+);
 
 final dailyAffirmationProvider = Provider<String>((ref) {
   final affirmations = [
@@ -30,10 +34,7 @@ class SelfCareState {
   final List<SelfCareItem> items;
   final bool isLoading;
 
-  const SelfCareState({
-    this.items = const [],
-    this.isLoading = false,
-  });
+  const SelfCareState({this.items = const [], this.isLoading = false});
 
   SelfCareState copyWith({List<SelfCareItem>? items, bool? isLoading}) {
     return SelfCareState(
@@ -45,43 +46,70 @@ class SelfCareState {
 
 class SelfCareNotifier extends Notifier<SelfCareState> {
   late final SelfCareRepository _repository;
+  bool _initialized = false;
 
   @override
   SelfCareState build() {
     _repository = ref.read(selfCareRepositoryProvider);
-    _init();
-    return const SelfCareState();
+    // Schedule async init after build completes so state mutations
+    // happen outside the synchronous build phase.
+    Future.microtask(() => _init());
+    return const SelfCareState(isLoading: true);
   }
 
   Future<void> _init() async {
-    await loadItems();
-    final items = state.items;
-    if (items.isEmpty) {
-      await _seedDefaults();
+    if (_initialized) return;
+    _initialized = true;
+    try {
+      await loadItems();
+      if (state.items.isEmpty) {
+        await _seedDefaults();
+      }
+      await _repository.resetDailyCompletions();
+      await loadItems();
+    } catch (e) {
+      // Fall back to empty state on error
+      state = state.copyWith(isLoading: false);
     }
-    await _repository.resetDailyCompletions();
-    await loadItems();
   }
 
   Future<void> _seedDefaults() async {
     final defaults = [
       SelfCareItem(
-        id: '', title: '喝一杯温水', durationMinutes: 5, createdAt: DateTime.now().toIso8601String(),
+        id: '',
+        title: '喝一杯温水',
+        durationMinutes: 5,
+        createdAt: DateTime.now().toIso8601String(),
       ),
       SelfCareItem(
-        id: '', title: '出门散步', durationMinutes: 15, createdAt: DateTime.now().toIso8601String(),
+        id: '',
+        title: '出门散步',
+        durationMinutes: 15,
+        createdAt: DateTime.now().toIso8601String(),
       ),
       SelfCareItem(
-        id: '', title: '写下3件感恩的事', durationMinutes: 10, createdAt: DateTime.now().toIso8601String(),
+        id: '',
+        title: '写下3件感恩的事',
+        durationMinutes: 10,
+        createdAt: DateTime.now().toIso8601String(),
       ),
       SelfCareItem(
-        id: '', title: '听一首喜欢的歌', durationMinutes: 5, createdAt: DateTime.now().toIso8601String(),
+        id: '',
+        title: '听一首喜欢的歌',
+        durationMinutes: 5,
+        createdAt: DateTime.now().toIso8601String(),
       ),
       SelfCareItem(
-        id: '', title: '给植物浇水', durationMinutes: 5, createdAt: DateTime.now().toIso8601String(),
+        id: '',
+        title: '给植物浇水',
+        durationMinutes: 5,
+        createdAt: DateTime.now().toIso8601String(),
       ),
       SelfCareItem(
-        id: '', title: '深呼吸5次', durationMinutes: 3, createdAt: DateTime.now().toIso8601String(),
+        id: '',
+        title: '深呼吸5次',
+        durationMinutes: 3,
+        createdAt: DateTime.now().toIso8601String(),
       ),
     ];
     for (final item in defaults) {
