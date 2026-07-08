@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'core/constants/app_colors.dart';
 import 'features/breathing/breathing_page.dart';
 import 'features/breathing/breathing_session.dart';
 import 'features/breathing/breathing_complete.dart';
@@ -148,6 +149,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
+        backgroundColor: AppColors.cardColor,
+        indicatorColor: AppColors.primaryColor.withValues(alpha: 0.15),
+        surfaceTintColor: Colors.transparent,
+        height: 72,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         onDestinationSelected: (index) {
           navigationShell.goBranch(
             index,
@@ -180,3 +186,4 @@ class ScaffoldWithNavBar extends StatelessWidget {
     );
   }
 }
+

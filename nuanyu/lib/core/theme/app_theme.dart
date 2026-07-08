@@ -37,14 +37,35 @@ class AppTheme {
         ),
       ),
 
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.cardColor,
-        selectedItemColor: AppColors.primaryColor,
-        unselectedItemColor: AppColors.textSecondary,
-        type: BottomNavigationBarType.fixed,
-        elevation: 4,
-        selectedLabelStyle: TextStyle(fontSize: 12, letterSpacing: 0),
-        unselectedLabelStyle: TextStyle(fontSize: 12, letterSpacing: 0),
+        indicatorColor: AppColors.primaryColor.withValues(alpha: 0.15),
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AppColors.shadowColor,
+        elevation: 2,
+        height: 72,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.primaryColor, size: 24);
+          }
+          return const IconThemeData(color: AppColors.textSecondary, size: 24);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 12,
+              color: AppColors.primaryColor,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0,
+            );
+          }
+          return const TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+            letterSpacing: 0,
+          );
+        }),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
