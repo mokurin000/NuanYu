@@ -1,4 +1,6 @@
-﻿/// Date utility functions for the NuanYu app.
+﻿library;
+
+/// Date utility functions for the NuanYu app.
 /// Provides formatting and comparison helpers for DateTime values.
 
 String formatDate(DateTime date) {

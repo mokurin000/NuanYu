@@ -5,9 +5,7 @@ import '../../../data/repositories/self_care_repository.dart';
 
 final selfCareRepositoryProvider = Provider<SelfCareRepository>((ref) => SelfCareRepository());
 
-final selfCareProvider = StateNotifierProvider<SelfCareNotifier, SelfCareState>((ref) {
-  return SelfCareNotifier(ref.read(selfCareRepositoryProvider));
-});
+final selfCareProvider = NotifierProvider<SelfCareNotifier, SelfCareState>(SelfCareNotifier.new);
 
 final dailyAffirmationProvider = Provider<String>((ref) {
   final affirmations = [
@@ -45,11 +43,14 @@ class SelfCareState {
   }
 }
 
-class SelfCareNotifier extends StateNotifier<SelfCareState> {
-  final SelfCareRepository _repository;
+class SelfCareNotifier extends Notifier<SelfCareState> {
+  late final SelfCareRepository _repository;
 
-  SelfCareNotifier(this._repository) : super(const SelfCareState()) {
+  @override
+  SelfCareState build() {
+    _repository = ref.read(selfCareRepositoryProvider);
     _init();
+    return const SelfCareState();
   }
 
   Future<void> _init() async {

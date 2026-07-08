@@ -92,12 +92,11 @@ class BreathingState {
   }
 }
 
-final breathingProvider = StateNotifierProvider<BreathingNotifier, BreathingState>((ref) {
-  return BreathingNotifier();
-});
+final breathingProvider = NotifierProvider<BreathingNotifier, BreathingState>(BreathingNotifier.new);
 
-class BreathingNotifier extends StateNotifier<BreathingState> {
-  BreathingNotifier() : super(const BreathingState());
+class BreathingNotifier extends Notifier<BreathingState> {
+  @override
+  BreathingState build() => const BreathingState();
 
   void selectPattern(BreathingPattern pattern) {
     state = state.copyWith(selectedPattern: pattern);
@@ -118,7 +117,7 @@ class BreathingNotifier extends StateNotifier<BreathingState> {
   void tick() {
     if (state.sessionState != SessionState.running) return;
     final pattern = state.selectedPattern!;
-    
+
     var newPhaseSeconds = state.phaseSeconds + 1;
     var newPhase = state.currentPhase;
     var newCycleCount = state.cycleCount;
@@ -131,19 +130,15 @@ class BreathingNotifier extends StateNotifier<BreathingState> {
       case BreathPhase.inhale:
         maxPhaseSeconds = pattern.inhaleSeconds;
         nextPhase = BreathPhase.hold;
-        break;
       case BreathPhase.hold:
         maxPhaseSeconds = pattern.holdSeconds;
         nextPhase = BreathPhase.exhale;
-        break;
       case BreathPhase.exhale:
         maxPhaseSeconds = pattern.exhaleSeconds;
         nextPhase = pattern.postHoldSeconds != null ? BreathPhase.rest : BreathPhase.inhale;
-        break;
       case BreathPhase.rest:
         maxPhaseSeconds = pattern.postHoldSeconds!;
         nextPhase = BreathPhase.inhale;
-        break;
     }
 
     if (newPhaseSeconds >= maxPhaseSeconds) {

@@ -45,8 +45,8 @@ class WarmCard extends StatelessWidget {
       return InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimensions.borderRadiusMedium),
-        splashColor: AppColors.primaryColor.withOpacity(0.1),
-        highlightColor: AppColors.primaryColor.withOpacity(0.05),
+        splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
+        highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
         child: card,
       );
     }

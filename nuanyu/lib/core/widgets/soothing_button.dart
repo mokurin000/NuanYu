@@ -78,7 +78,7 @@ class _SoothingButtonState extends State<SoothingButton>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeInOut,
-        transform: Matrix4.identity()..scale(_scaleAnimation.value),
+        transform: Matrix4.diagonal3Values(_scaleAnimation.value, _scaleAnimation.value, 1.0),
         constraints: BoxConstraints(minHeight: widget.minHeight),
         decoration: BoxDecoration(
           color: AppColors.primaryColor,
@@ -122,4 +122,3 @@ class _SoothingButtonState extends State<SoothingButton>
     );
   }
 }
-

@@ -65,22 +65,6 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
     setState(() => _isRunning = false);
   }
 
-  void _resume() {
-    setState(() => _isRunning = true);
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-        } else {
-          _timer?.cancel();
-          _isRunning = false;
-          _isCompleted = true;
-          HapticFeedback.heavyImpact();
-        }
-      });
-    });
-  }
-
   void _markComplete() {
     ref.read(selfCareProvider.notifier).toggleCompletedToday(widget.itemId);
     context.pop();

@@ -4,9 +4,7 @@ import '../../../data/repositories/journal_repository.dart';
 
 final journalRepositoryProvider = Provider<JournalRepository>((ref) => JournalRepository());
 
-final journalProvider = StateNotifierProvider<JournalNotifier, JournalState>((ref) {
-  return JournalNotifier(ref.read(journalRepositoryProvider));
-});
+final journalProvider = NotifierProvider<JournalNotifier, JournalState>(JournalNotifier.new);
 
 class JournalState {
   final List<JournalEntry> entries;
@@ -22,11 +20,14 @@ class JournalState {
   }
 }
 
-class JournalNotifier extends StateNotifier<JournalState> {
-  final JournalRepository _repository;
+class JournalNotifier extends Notifier<JournalState> {
+  late final JournalRepository _repository;
 
-  JournalNotifier(this._repository) : super(const JournalState()) {
+  @override
+  JournalState build() {
+    _repository = ref.read(journalRepositoryProvider);
     loadAll();
+    return const JournalState();
   }
 
   Future<void> loadAll() async {

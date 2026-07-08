@@ -116,7 +116,7 @@ class _JournalEditPageState extends ConsumerState<JournalEditPage> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: 11,
-                  separatorBuilder: (_, __) => const SizedBox(width: 6),
+                  separatorBuilder: (_, _) => const SizedBox(width: 6),
                   itemBuilder: (context, index) {
                     final score = index;
                     final isSelected = _moodScore == score;

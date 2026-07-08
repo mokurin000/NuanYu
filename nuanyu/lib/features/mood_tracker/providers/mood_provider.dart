@@ -5,9 +5,7 @@ import '../../../data/repositories/mood_repository.dart';
 
 final moodRepositoryProvider = Provider<MoodRepository>((ref) => MoodRepository());
 
-final moodProvider = StateNotifierProvider<MoodNotifier, MoodState>((ref) {
-  return MoodNotifier(ref.read(moodRepositoryProvider));
-});
+final moodProvider = NotifierProvider<MoodNotifier, MoodState>(MoodNotifier.new);
 
 class MoodState {
   final List<MoodEntry> entries;
@@ -33,11 +31,14 @@ class MoodState {
   }
 }
 
-class MoodNotifier extends StateNotifier<MoodState> {
-  final MoodRepository _repository;
+class MoodNotifier extends Notifier<MoodState> {
+  late final MoodRepository _repository;
 
-  MoodNotifier(this._repository) : super(MoodState(selectedDate: DateTime.now())) {
+  @override
+  MoodState build() {
+    _repository = ref.read(moodRepositoryProvider);
     loadEntries();
+    return MoodState(selectedDate: DateTime.now());
   }
 
   Future<void> loadEntries() async {

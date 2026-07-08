@@ -1,9 +1,7 @@
 ﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
-});
+final authProvider = NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);
 
 class AuthState {
   final bool isLocked;
@@ -25,11 +23,13 @@ class AuthState {
   }
 }
 
-class AuthNotifier extends StateNotifier<AuthState> {
+class AuthNotifier extends Notifier<AuthState> {
   final LocalAuthentication _localAuth = LocalAuthentication();
 
-  AuthNotifier() : super(const AuthState(isLocked: true, isAvailable: false)) {
+  @override
+  AuthState build() {
     _checkAvailability();
+    return const AuthState(isLocked: true, isAvailable: false);
   }
 
   Future<void> _checkAvailability() async {
@@ -52,18 +52,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     try {
       final authenticated = await _localAuth.authenticate(
-        localizedReason: '请验证身份以解锁暖屿',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
+        localizedReason: '\u8bf7\u9a8c\u8bc1\u8eab\u4efd\u4ee5\u89e3\u9501\u6696\u5c7f',
       );
 
       if (authenticated) {
         state = state.copyWith(isLocked: false, error: null);
         return true;
       } else {
-        state = state.copyWith(error: '验证失败');
+        state = state.copyWith(error: '\u9a8c\u8bc1\u5931\u8d25');
         return false;
       }
     } catch (e) {

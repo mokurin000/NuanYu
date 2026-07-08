@@ -7,9 +7,7 @@ import '../../data/repositories/self_care_repository.dart';
 
 enum ExportStatus { idle, exporting, done, error }
 
-final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
-  return SettingsNotifier();
-});
+final settingsProvider = NotifierProvider<SettingsNotifier, SettingsState>(SettingsNotifier.new);
 
 class SettingsState {
   final ExportStatus exportStatus;
@@ -35,8 +33,9 @@ class SettingsState {
   }
 }
 
-class SettingsNotifier extends StateNotifier<SettingsState> {
-  SettingsNotifier() : super(const SettingsState());
+class SettingsNotifier extends Notifier<SettingsState> {
+  @override
+  SettingsState build() => const SettingsState();
 
   Future<void> exportAllData() async {
     state = state.copyWith(exportStatus: ExportStatus.exporting, exportError: null);
