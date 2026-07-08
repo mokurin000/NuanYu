@@ -1,11 +1,8 @@
-﻿import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_soloud/flutter_soloud.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/services/notification_service.dart';
+import 'providers/care_timer_provider.dart';
 import 'providers/self_care_provider.dart';
 
 class CareTimerPage extends ConsumerStatefulWidget {
@@ -18,98 +15,27 @@ class CareTimerPage extends ConsumerStatefulWidget {
 }
 
 class _CareTimerPageState extends ConsumerState<CareTimerPage> {
-  Timer? _timer;
-  late final SoLoud _alarmSoLoud;
-  AudioSource? _alarmSource;
-  bool _alarmReady = false;
-  int _remainingSeconds = 0;
-  int _totalSeconds = 0;
-  bool _isRunning = false;
-  bool _isCompleted = false;
-
   @override
   void initState() {
     super.initState();
-    _alarmSoLoud = SoLoud.instance;
-    _initAlarm();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final items = ref.read(selfCareProvider).items;
       final item = items.where((i) => i.id == widget.itemId).firstOrNull;
       if (item != null) {
-        setState(() {
-          _remainingSeconds = item.durationMinutes * 60;
-          _totalSeconds = _remainingSeconds;
-        });
+        // Provider.init() is defensive: if the same item is already
+        // running or paused, it preserves the live countdown.
+        ref.read(careTimerProvider.notifier).init(
+          widget.itemId,
+          item.durationMinutes * 60,
+        );
       }
     });
   }
 
-  Future<void> _initAlarm() async {
-    await _alarmSoLoud.init();
-    _alarmSource = await _alarmSoLoud.loadAsset('assets/ding.mp3');
-    _alarmReady = true;
-  }
-
-  void _playAlarm() {
-    if (_alarmReady && _alarmSource != null) {
-      _alarmSoLoud.play(_alarmSource!);
-    }
-  }
-
   @override
   void dispose() {
-    _timer?.cancel();
-    _alarmSoLoud.deinit();
+    // The timer lives in the provider — don't cancel it here.
     super.dispose();
-  }
-
-  void _start() {
-    setState(() => _isRunning = true);
-    HapticFeedback.lightImpact();
-    NotificationService().showCareTimerNotification(
-      remainingSeconds: _remainingSeconds,
-      totalSeconds: _totalSeconds,
-    );
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-          NotificationService().updateCareTimerProgress(
-            remainingSeconds: _remainingSeconds,
-            totalSeconds: _totalSeconds,
-          );
-        } else {
-          _timer?.cancel();
-          _isRunning = false;
-          _isCompleted = true;
-          HapticFeedback.heavyImpact();
-          _playAlarm();
-          NotificationService().cancelCareTimerNotification();
-          NotificationService().showCareTimerCompleteNotification();
-        }
-      });
-    });
-  }
-
-  void _pause() {
-    _timer?.cancel();
-    setState(() => _isRunning = false);
-    NotificationService().cancelCareTimerNotification();
-  }
-
-  void _reset() {
-    _timer?.cancel();
-    setState(() {
-      _remainingSeconds = _totalSeconds;
-      _isRunning = false;
-      _isCompleted = false;
-    });
-    NotificationService().cancelCareTimerNotification();
-  }
-
-  void _markComplete() {
-    ref.read(selfCareProvider.notifier).toggleCompletedToday(widget.itemId);
-    context.pop();
   }
 
   String _formatTime(int seconds) {
@@ -118,15 +44,22 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
     return '${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
   }
 
-  double get _progress {
-    if (_totalSeconds == 0) return 0;
-    return _remainingSeconds / _totalSeconds;
+  double _progress(int remaining, int total) {
+    if (total == 0) return 0;
+    return remaining / total;
   }
 
   @override
   Widget build(BuildContext context) {
+    final timerState = ref.watch(careTimerProvider);
     final items = ref.watch(selfCareProvider).items;
     final item = items.where((i) => i.id == widget.itemId).firstOrNull;
+
+    final isRunning = timerState.status == CareTimerStatus.running;
+    final isPaused = timerState.status == CareTimerStatus.paused;
+    final isCompleted = timerState.status == CareTimerStatus.completed;
+    final canStart =
+        timerState.status == CareTimerStatus.idle || isPaused;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -150,13 +83,16 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                       width: 220,
                       height: 220,
                       child: CircularProgressIndicator(
-                        value: 1 - _progress,
+                        value: 1 -
+                            _progress(
+                              timerState.remainingSeconds,
+                              timerState.totalSeconds,
+                            ),
                         strokeWidth: 8,
-                        backgroundColor: AppColors.secondaryColor.withValues(
-                          alpha: 0.3,
-                        ),
+                        backgroundColor:
+                            AppColors.secondaryColor.withValues(alpha: 0.3),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          _isCompleted
+                          isCompleted
                               ? AppColors.moodGreat
                               : AppColors.primaryColor,
                         ),
@@ -166,20 +102,24 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _isCompleted ? '完成！' : _formatTime(_remainingSeconds),
+                          isCompleted
+                              ? '完成！'
+                              : _formatTime(timerState.remainingSeconds),
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w300,
-                            color: _isCompleted
+                            color: isCompleted
                                 ? AppColors.moodGreat
                                 : AppColors.textPrimary,
                           ),
                         ),
-                        if (!_isCompleted)
+                        if (!isCompleted)
                           Text(
-                            _isRunning
+                            isRunning
                                 ? '进行中'
-                                : (_totalSeconds > 0 ? '准备开始' : ''),
+                                : (timerState.totalSeconds > 0
+                                    ? (isPaused ? '已暂停' : '准备开始')
+                                    : ''),
                             style: const TextStyle(
                               color: AppColors.textSecondary,
                             ),
@@ -190,12 +130,14 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                 ),
               ),
               const Spacer(flex: 2),
-              if (!_isCompleted && _totalSeconds > 0) ...[
-                if (!_isRunning)
+              if (!isCompleted && timerState.totalSeconds > 0) ...[
+                if (canStart)
                   ElevatedButton.icon(
-                    onPressed: _start,
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('开始'),
+                    onPressed: () {
+                      ref.read(careTimerProvider.notifier).start();
+                    },
+                    icon: Icon(isPaused ? Icons.play_arrow : Icons.play_arrow),
+                    label: Text(isPaused ? '继续' : '开始'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
@@ -208,19 +150,35 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
                       ),
                     ),
                   )
-                else
+                else if (isRunning)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _CircleButton(icon: Icons.pause, onPressed: _pause),
+                      _CircleButton(
+                        icon: Icons.pause,
+                        onPressed: () {
+                          ref.read(careTimerProvider.notifier).pause();
+                        },
+                      ),
                       const SizedBox(width: 24),
-                      _CircleButton(icon: Icons.stop, onPressed: _reset),
+                      _CircleButton(
+                        icon: Icons.stop,
+                        onPressed: () {
+                          ref.read(careTimerProvider.notifier).reset();
+                        },
+                      ),
                     ],
                   ),
               ],
-              if (_isCompleted)
+              if (isCompleted)
                 ElevatedButton.icon(
-                  onPressed: _markComplete,
+                  onPressed: () {
+                    ref
+                        .read(selfCareProvider.notifier)
+                        .toggleCompletedToday(widget.itemId);
+                    ref.read(careTimerProvider.notifier).markCompleted();
+                    context.pop();
+                  },
                   icon: const Icon(Icons.check),
                   label: const Text('标记完成'),
                   style: ElevatedButton.styleFrom(
