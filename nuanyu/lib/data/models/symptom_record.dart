@@ -27,11 +27,11 @@ class SymptomRecord {
       id: json['id'] as String,
       date: json['date'] as String,
       time: json['time'] as String,
-      symptomType: json['symptomType'] as String,
+      symptomType: json['symptom_type'] as String,
       intensity: json['intensity'] as int,
       trigger: json['trigger'] as String?,
       note: json['note'] as String?,
-      createdAt: json['createdAt'] as String?,
+      createdAt: json['created_at'] as String?,
     );
   }
 
@@ -40,11 +40,11 @@ class SymptomRecord {
       'id': id,
       'date': date,
       'time': time,
-      'symptomType': symptomType,
+      'symptom_type': symptomType,
       'intensity': intensity,
       'trigger': trigger,
       'note': note,
-      'createdAt': createdAt,
+      'created_at': createdAt,
     };
   }
 
@@ -86,3 +86,4 @@ class SymptomRecord {
   @override
   int get hashCode => id.hashCode;
 }
+

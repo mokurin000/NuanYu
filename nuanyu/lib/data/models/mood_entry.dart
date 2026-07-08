@@ -25,10 +25,10 @@ class MoodEntry {
       id: json['id'] as String,
       date: json['date'] as String,
       time: json['time'] as String,
-      moodScore: json['moodScore'] as int,
-      emotionLabel: json['emotionLabel'] as String?,
+      moodScore: json['mood_score'] as int,
+      emotionLabel: json['emotion_label'] as String?,
       note: json['note'] as String?,
-      createdAt: json['createdAt'] as String?,
+      createdAt: json['created_at'] as String?,
     );
   }
 
@@ -37,10 +37,10 @@ class MoodEntry {
       'id': id,
       'date': date,
       'time': time,
-      'moodScore': moodScore,
-      'emotionLabel': emotionLabel,
+      'mood_score': moodScore,
+      'emotion_label': emotionLabel,
       'note': note,
-      'createdAt': createdAt,
+      'created_at': createdAt,
     };
   }
 
@@ -80,3 +80,4 @@ class MoodEntry {
   @override
   int get hashCode => id.hashCode;
 }
+
