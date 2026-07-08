@@ -1,13 +1,25 @@
 ﻿import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ExportUtils {
-  static Future<String> exportToJson(Map<String, dynamic> data) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').split('.')[0];
+  /// Opens Android SAF directory picker, then writes the JSON export to the
+  /// user-chosen directory. Returns the full file path on success, or null if
+  /// the user cancels.
+  static Future<String?> exportToJson(Map<String, dynamic> data) async {
+    final dirPath = await FilePicker.getDirectoryPath(
+      dialogTitle: '选择导出目录',
+    );
+
+    if (dirPath == null) return null;
+
+    final timestamp = DateTime.now()
+        .toIso8601String()
+        .replaceAll(':', '-')
+        .split('.')
+        .first;
     final fileName = 'nuanyu_export_$timestamp.json';
-    final file = File('${dir.path}/$fileName');
+    final file = File('$dirPath/$fileName');
 
     const encoder = JsonEncoder.withIndent('  ');
     final jsonString = encoder.convert(data);

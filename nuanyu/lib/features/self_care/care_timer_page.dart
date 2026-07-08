@@ -65,6 +65,15 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
     setState(() => _isRunning = false);
   }
 
+  void _reset() {
+    _timer?.cancel();
+    setState(() {
+      _remainingSeconds = _totalSeconds;
+      _isRunning = false;
+      _isCompleted = false;
+    });
+  }
+
   void _markComplete() {
     ref.read(selfCareProvider.notifier).toggleCompletedToday(widget.itemId);
     context.pop();
@@ -93,101 +102,95 @@ class _CareTimerPageState extends ConsumerState<CareTimerPage> {
         backgroundColor: AppColors.backgroundColor,
       ),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(flex: 2),
-            // Circular progress
-            SizedBox(
-              width: 220,
-              height: 220,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 220,
-                    height: 220,
-                    child: CircularProgressIndicator(
-                      value: 1 - _progress,
-                      strokeWidth: 8,
-                      backgroundColor: AppColors.secondaryColor.withValues(alpha: 0.3),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _isCompleted ? AppColors.moodGreat : AppColors.primaryColor,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(flex: 2),
+              SizedBox(
+                width: 220,
+                height: 220,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 220,
+                      height: 220,
+                      child: CircularProgressIndicator(
+                        value: 1 - _progress,
+                        strokeWidth: 8,
+                        backgroundColor: AppColors.secondaryColor.withValues(alpha: 0.3),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _isCompleted ? AppColors.moodGreat : AppColors.primaryColor,
+                        ),
                       ),
                     ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _isCompleted ? '完成！' : _formatTime(_remainingSeconds),
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w300,
-                          color: _isCompleted ? AppColors.moodGreat : AppColors.textPrimary,
-                        ),
-                      ),
-                      if (!_isCompleted)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         Text(
-                          _isRunning ? '进行中' : (_totalSeconds > 0 ? '准备开始' : ''),
-                          style: const TextStyle(color: AppColors.textSecondary),
+                          _isCompleted ? '完成！' : _formatTime(_remainingSeconds),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w300,
+                            color: _isCompleted ? AppColors.moodGreat : AppColors.textPrimary,
+                          ),
                         ),
+                        if (!_isCompleted)
+                          Text(
+                            _isRunning ? '进行中' : (_totalSeconds > 0 ? '准备开始' : ''),
+                            style: const TextStyle(color: AppColors.textSecondary),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(flex: 2),
+              if (!_isCompleted && _totalSeconds > 0) ...[
+                if (!_isRunning)
+                  ElevatedButton.icon(
+                    onPressed: _start,
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('开始'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _CircleButton(
+                        icon: Icons.pause,
+                        onPressed: _pause,
+                      ),
+                      const SizedBox(width: 24),
+                      _CircleButton(
+                        icon: Icons.stop,
+                        onPressed: _reset,
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const Spacer(flex: 2),
-            // Controls
-            if (!_isCompleted && _totalSeconds > 0) ...[
-              if (!_isRunning)
+              ],
+              if (_isCompleted)
                 ElevatedButton.icon(
-                  onPressed: _start,
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text('开始'),
+                  onPressed: _markComplete,
+                  icon: const Icon(Icons.check),
+                  label: const Text('标记完成'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
+                    backgroundColor: AppColors.moodGreat,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                )
-              else
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _CircleButton(
-                      icon: Icons.pause,
-                      onPressed: _pause,
-                    ),
-                    const SizedBox(width: 24),
-                    _CircleButton(
-                      icon: Icons.stop,
-                      onPressed: () {
-                        _timer?.cancel();
-                        setState(() {
-                          _remainingSeconds = _totalSeconds;
-                          _isRunning = false;
-                        });
-                      },
-                    ),
-                  ],
                 ),
+              const Spacer(),
             ],
-            if (_isCompleted)
-              ElevatedButton.icon(
-                onPressed: _markComplete,
-                icon: const Icon(Icons.check),
-                label: const Text('标记完成'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.moodGreat,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            const Spacer(),
-          ],
+          ),
         ),
       ),
     );

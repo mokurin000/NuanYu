@@ -26,7 +26,7 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('导出全部数据'),
             subtitle: const Text('将所有记录导出为 JSON 文件'),
             trailing: _exportTrailing(state),
-            onTap: state.exportStatus == ExportStatus.exporting
+            onTap: state.exportStatus == ExportStatus.exporting || state.exportStatus == ExportStatus.cancelled
                 ? null
                 : () => ref.read(settingsProvider.notifier).exportAllData(),
           ),
@@ -37,6 +37,11 @@ class SettingsPage extends ConsumerWidget {
                 '已导出到: ${state.exportPath}',
                 style: const TextStyle(fontSize: 12, color: AppColors.moodGreat),
               ),
+            ),
+          if (state.exportStatus == ExportStatus.cancelled)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text('已取消导出', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ),
           if (state.exportStatus == ExportStatus.error)
             Padding(
@@ -88,6 +93,8 @@ class SettingsPage extends ConsumerWidget {
         return const Icon(Icons.check_circle, color: AppColors.moodGreat);
       case ExportStatus.error:
         return const Icon(Icons.error, color: Colors.redAccent);
+      case ExportStatus.cancelled:
+        return const Icon(Icons.close, color: AppColors.textSecondary);
     }
   }
 
@@ -132,3 +139,4 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
+

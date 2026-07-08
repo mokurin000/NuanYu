@@ -5,7 +5,7 @@ import '../../data/repositories/symptom_repository.dart';
 import '../../data/repositories/journal_repository.dart';
 import '../../data/repositories/self_care_repository.dart';
 
-enum ExportStatus { idle, exporting, done, error }
+enum ExportStatus { idle, exporting, done, error, cancelled }
 
 final settingsProvider = NotifierProvider<SettingsNotifier, SettingsState>(SettingsNotifier.new);
 
@@ -61,10 +61,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
       };
 
       final path = await ExportUtils.exportToJson(data);
-      state = state.copyWith(
-        exportStatus: ExportStatus.done,
-        exportPath: path,
-      );
+
+      if (path == null) {
+        state = state.copyWith(exportStatus: ExportStatus.cancelled);
+      } else {
+        state = state.copyWith(
+          exportStatus: ExportStatus.done,
+          exportPath: path,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         exportStatus: ExportStatus.error,

@@ -17,10 +17,10 @@ class MoodRecordSheet extends ConsumerStatefulWidget {
 
 class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
   late double _moodScore;
-  String? _emotionLabel;
+  late List<String> _selectedLabels;
   late TextEditingController _noteController;
 
-  final List<String> _emotionLabels = [
+  static const _emotionLabels = [
     '平静', '开心', '感恩', '希望', '满足',
     '焦虑', '悲伤', '愤怒', '恐惧', '羞愧',
     '孤独', '麻木', '疲惫', '困惑',
@@ -30,7 +30,10 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
   void initState() {
     super.initState();
     _moodScore = widget.existingEntry?.moodScore.toDouble() ?? 5.0;
-    _emotionLabel = widget.existingEntry?.emotionLabel;
+    final existingLabel = widget.existingEntry?.emotionLabel;
+    _selectedLabels = existingLabel != null && existingLabel.isNotEmpty
+        ? existingLabel.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList()
+        : [];
     _noteController = TextEditingController(text: widget.existingEntry?.note ?? '');
   }
 
@@ -42,12 +45,13 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
 
   Future<void> _save() async {
     final now = DateTime.now();
+    final labelsStr = _selectedLabels.isNotEmpty ? _selectedLabels.join('、') : null;
     final entry = MoodEntry(
       id: widget.existingEntry?.id ?? '',
       date: du.formatDate(now),
       time: du.formatTime(now),
       moodScore: _moodScore.round(),
-      emotionLabel: _emotionLabel,
+      emotionLabel: labelsStr,
       note: _noteController.text.isNotEmpty ? _noteController.text : null,
       createdAt: now.toIso8601String(),
     );
@@ -82,7 +86,6 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Handle
             Center(
               child: Container(
                 width: 40,
@@ -94,33 +97,19 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
               ),
             ),
             const SizedBox(height: 20),
-            // Mood score
             Text(
               '情绪评分',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 8),
             Center(
               child: Text(
                 '${_moodScore.round()}',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: color),
               ),
             ),
             Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: color,
-                ),
-              ),
+              child: Text(label, style: TextStyle(fontSize: 16, color: color)),
             ),
             const SizedBox(height: 12),
             SliderTheme(
@@ -138,35 +127,48 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
               ),
             ),
             const SizedBox(height: 8),
-            // Emotion labels
-            Text(
-              '情绪标签（可选）',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+            Row(
+              children: [
+                const Text(
+                  '情绪标签（可多选）',
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                ),
+                const Spacer(),
+                if (_selectedLabels.isNotEmpty)
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedLabels.clear()),
+                    child: const Text(
+                      '清除',
+                      style: TextStyle(fontSize: 13, color: AppColors.primaryColor),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _emotionLabels.map((label) {
-                final isSelected = _emotionLabel == label;
-                return ChoiceChip(
-                  label: Text(label, style: TextStyle(fontSize: 13)),
+              children: _emotionLabels.map((lbl) {
+                final isSelected = _selectedLabels.contains(lbl);
+                return FilterChip(
+                  label: Text(lbl, style: const TextStyle(fontSize: 13)),
                   selected: isSelected,
                   selectedColor: AppColors.primaryColor.withValues(alpha: 0.2),
                   backgroundColor: AppColors.cardColor,
+                  checkmarkColor: AppColors.primaryColor,
                   onSelected: (selected) {
                     setState(() {
-                      _emotionLabel = selected ? label : null;
+                      if (selected) {
+                        _selectedLabels.add(lbl);
+                      } else {
+                        _selectedLabels.remove(lbl);
+                      }
                     });
                   },
                 );
               }).toList(),
             ),
             const SizedBox(height: 16),
-            // Note
             TextField(
               controller: _noteController,
               decoration: InputDecoration(
@@ -181,16 +183,13 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
               maxLines: 3,
             ),
             const SizedBox(height: 24),
-            // Save button
             ElevatedButton(
               onPressed: _save,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('保存', style: TextStyle(fontSize: 16)),
             ),
@@ -200,4 +199,3 @@ class _MoodRecordSheetState extends ConsumerState<MoodRecordSheet> {
     );
   }
 }
-
