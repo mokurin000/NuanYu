@@ -26,7 +26,7 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('导出全部数据'),
             subtitle: const Text('将所有记录导出为 JSON 文件'),
             trailing: _exportTrailing(state),
-            onTap: state.exportStatus == ExportStatus.exporting || state.exportStatus == ExportStatus.cancelled
+            onTap: state.exportStatus == ExportStatus.exporting
                 ? null
                 : () => ref.read(settingsProvider.notifier).exportAllData(),
           ),
@@ -139,4 +139,5 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
+
 
