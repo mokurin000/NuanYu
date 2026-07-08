@@ -3,13 +3,8 @@ name: 🛠 Build & Release
 on:
   push:
     branches: [main, master]
-    paths:
-      - /nuanyu/assets/**/*
-      - /nuanyu/lib/**/*.dart
-      - /nuanyu/pubspec.yaml
-      - /nuanyu/pubspec.lock
-  pull_request:
-    branches: [main, master]
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
