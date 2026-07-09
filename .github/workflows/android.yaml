@@ -2,6 +2,15 @@ name: 🛠 Android CI / Build & Release APK
 
 on:
   workflow_call:
+    secrets:
+      KEYSTORE_BASE64:
+        required: true
+      KEY_ALIAS:
+        required: true
+      KEY_PASSWORD:
+        required: true
+      STORE_PASSWORD:
+        required: true
 
 permissions:
   contents: write # allow creating/updating Releases & uploading assets
@@ -42,6 +51,16 @@ jobs:
         run: |
           cd nuanyu
           dart run build_runner build
+
+      - name: 🔑 Setup release signing
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > nuanyu/android/release.keystore
+          cat > nuanyu/android/key.properties <<-EOF
+          storeFile=release.keystore
+          storePassword=${{ secrets.STORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          EOF
 
       - name: 🏗️ Build APKs
         run: |
