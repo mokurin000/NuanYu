@@ -30,18 +30,28 @@ class SettingsPage extends ConsumerWidget {
                 ? null
                 : () => ref.read(settingsProvider.notifier).exportAllData(),
           ),
-          if (state.exportStatus == ExportStatus.done && state.exportPath != null)
+          if (state.exportStatus == ExportStatus.done &&
+              state.exportPath != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 '已导出到: ${state.exportPath}',
-                style: const TextStyle(fontSize: 12, color: AppColors.moodGreat),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.moodGreat,
+                ),
               ),
             ),
           if (state.exportStatus == ExportStatus.cancelled)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text('已取消导出', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              child: Text(
+                '已取消导出',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
             ),
           if (state.exportStatus == ExportStatus.error)
             Padding(
@@ -55,7 +65,10 @@ class SettingsPage extends ConsumerWidget {
           // About section
           _SectionHeader(title: '关于'),
           ListTile(
-            leading: const Icon(Icons.info_outline, color: AppColors.primaryColor),
+            leading: const Icon(
+              Icons.info_outline,
+              color: AppColors.primaryColor,
+            ),
             title: const Text('关于暖屿'),
             subtitle: const Text('版本 1.0.0'),
             onTap: () => _showAboutDialog(context),
@@ -66,14 +79,6 @@ class SettingsPage extends ConsumerWidget {
             subtitle: Text('CPTSD 自我管理 · 温暖陪伴'),
           ),
           const Divider(),
-          // Bio auth section
-          _SectionHeader(title: '安全'),
-          const ListTile(
-            leading: Icon(Icons.fingerprint, color: AppColors.primaryColor),
-            title: Text('生物验证锁'),
-            subtitle: Text('启动应用时需要验证身份'),
-            trailing: Icon(Icons.check, color: AppColors.primaryColor),
-          ),
         ],
       ),
     );
@@ -139,5 +144,3 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
-
-
