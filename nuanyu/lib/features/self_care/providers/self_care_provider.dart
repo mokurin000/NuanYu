@@ -11,8 +11,27 @@ final selfCareProvider = NotifierProvider<SelfCareNotifier, SelfCareState>(
   SelfCareNotifier.new,
 );
 
+final currentMinuteProvider = StreamProvider<DateTime>((ref) async* {
+  while (true) {
+    final now = DateTime.now();
+    yield now;
+
+    final nextMinute = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute + 1,
+    );
+
+    await Future.delayed(nextMinute.difference(now));
+  }
+});
+
 final dailyAffirmationProvider = Provider<String>((ref) {
-  final affirmations = [
+  final now = ref.watch(currentMinuteProvider).value ?? DateTime.now();
+
+  const affirmations = [
     '今天我允许自己慢慢来',
     '我的感受是被允许的',
     '我已经做得很好了',
@@ -26,8 +45,8 @@ final dailyAffirmationProvider = Provider<String>((ref) {
     '小小的进步，也是进步',
     '我在学着爱自己',
   ];
-  final time = DateTime.now();
-  final rng = Random(time.hour * 60 + time.minute);
+
+  final rng = Random(now.hour * 60 + now.minute);
   return affirmations[rng.nextInt(affirmations.length)];
 });
 
