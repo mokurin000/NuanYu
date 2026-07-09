@@ -26,7 +26,8 @@ final dailyAffirmationProvider = Provider<String>((ref) {
     '小小的进步，也是进步',
     '我在学着爱自己',
   ];
-  final rng = Random(DateTime.now().day);
+  final time = DateTime.now();
+  final rng = Random(time.hour * 60 + time.minute);
   return affirmations[rng.nextInt(affirmations.length)];
 });
 
