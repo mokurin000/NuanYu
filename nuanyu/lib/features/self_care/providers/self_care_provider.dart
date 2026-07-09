@@ -62,10 +62,12 @@ class SelfCareNotifier extends Notifier<SelfCareState> {
     if (_initialized) return;
     _initialized = true;
     try {
-      await loadItems();
-      if (state.items.isEmpty) {
+      // seed defaults if repo is empty
+      if ((await _repository.getAll()).isEmpty) {
         await _seedDefaults();
       }
+
+      await loadItems();
     } catch (e) {
       state = state.copyWith(isLoading: false);
     }
