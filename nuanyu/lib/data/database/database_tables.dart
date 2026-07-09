@@ -1,6 +1,6 @@
 ﻿class DatabaseTables {
   static const String databaseName = 'nuanyu.db';
-  static const int databaseVersion = 1;
+  static const int databaseVersion = 2;
 
   static const String tableMoodEntries = 'mood_entries';
   static const String tableSymptomRecords = 'symptom_records';
@@ -50,7 +50,6 @@
       title TEXT NOT NULL,
       description TEXT,
       duration_minutes INTEGER NOT NULL DEFAULT 5,
-      is_completed_today INTEGER NOT NULL DEFAULT 0,
       last_completed_date TEXT,
       created_at TEXT NOT NULL
     )

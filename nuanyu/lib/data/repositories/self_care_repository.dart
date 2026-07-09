@@ -54,29 +54,16 @@ class SelfCareRepository {
     );
   }
 
+  /// Sets [lastCompletedDate] to today. The [SelfCareItem.completed] getter
+  /// uses this field to decide whether the item is done for the current day.
   Future<void> markCompletedToday(String id) async {
     final db = await _dbHelper.database;
     final todayStr = du.formatDate(DateTime.now());
     await db.update(
       DatabaseTables.tableSelfCareItems,
-      {
-        'is_completed_today': 1,
-        'last_completed_date': todayStr,
-      },
+      {'last_completed_date': todayStr},
       where: 'id = ?',
       whereArgs: [id],
     );
   }
-
-  Future<void> resetDailyCompletions() async {
-    final db = await _dbHelper.database;
-    final todayStr = du.formatDate(DateTime.now());
-    await db.update(
-      DatabaseTables.tableSelfCareItems,
-      {'is_completed_today': 0},
-      where: 'is_completed_today = 1 AND last_completed_date != ?',
-      whereArgs: [todayStr],
-    );
-  }
 }
-

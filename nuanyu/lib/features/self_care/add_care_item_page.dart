@@ -30,9 +30,11 @@ class _AddCareItemPageState extends ConsumerState<AddCareItemPage> {
     final item = SelfCareItem(
       id: '',
       title: _titleController.text.trim(),
-      description: _descController.text.trim().isNotEmpty ? _descController.text.trim() : null,
+      description:
+          _descController.text.trim().isNotEmpty
+              ? _descController.text.trim()
+              : null,
       durationMinutes: _durationMinutes,
-      isCompletedToday: 0,
       createdAt: DateTime.now().toIso8601String(),
     );
 
@@ -80,7 +82,10 @@ class _AddCareItemPageState extends ConsumerState<AddCareItemPage> {
               maxLines: 2,
             ),
             const SizedBox(height: 16),
-            const Text('建议时长', style: TextStyle(color: AppColors.textSecondary)),
+            const Text(
+              '建议时长',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -120,7 +125,9 @@ class _AddCareItemPageState extends ConsumerState<AddCareItemPage> {
                 backgroundColor: AppColors.primaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: const Text('保存', style: TextStyle(fontSize: 16)),
             ),

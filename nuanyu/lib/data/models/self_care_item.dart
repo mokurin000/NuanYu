@@ -4,19 +4,25 @@ class SelfCareItem {
   final String title;
   final String? description;
   final int durationMinutes;
-  final int isCompletedToday;
   final String? lastCompletedDate;
   final String createdAt;
 
-  /// Computed: returns true when [isCompletedToday] equals 1.
-  bool get completed => isCompletedToday == 1;
+  /// Returns true when [lastCompletedDate] matches today's date.
+  /// This is computed dynamically so it automatically resets after midnight.
+  bool get completed {
+    if (lastCompletedDate == null) return false;
+    final now = DateTime.now();
+    final y = now.year.toString().padLeft(4, '0');
+    final m = now.month.toString().padLeft(2, '0');
+    final d = now.day.toString().padLeft(2, '0');
+    return lastCompletedDate == '$y-$m-$d';
+  }
 
   const SelfCareItem({
     required this.id,
     required this.title,
     this.description,
     required this.durationMinutes,
-    this.isCompletedToday = 0,
     this.lastCompletedDate,
     required this.createdAt,
   });
@@ -27,7 +33,6 @@ class SelfCareItem {
       title: json['title'] as String,
       description: json['description'] as String?,
       durationMinutes: json['duration_minutes'] as int,
-      isCompletedToday: json['is_completed_today'] as int? ?? 0,
       lastCompletedDate: json['last_completed_date'] as String?,
       createdAt: json['created_at'] as String,
     );
@@ -39,7 +44,6 @@ class SelfCareItem {
       'title': title,
       'description': description,
       'duration_minutes': durationMinutes,
-      'is_completed_today': isCompletedToday,
       'last_completed_date': lastCompletedDate,
       'created_at': createdAt,
     };
@@ -50,7 +54,6 @@ class SelfCareItem {
     String? title,
     String? Function()? description,
     int? durationMinutes,
-    int? isCompletedToday,
     String? Function()? lastCompletedDate,
     String? createdAt,
   }) {
@@ -59,7 +62,6 @@ class SelfCareItem {
       title: title ?? this.title,
       description: description != null ? description() : this.description,
       durationMinutes: durationMinutes ?? this.durationMinutes,
-      isCompletedToday: isCompletedToday ?? this.isCompletedToday,
       lastCompletedDate:
           lastCompletedDate != null ? lastCompletedDate() : this.lastCompletedDate,
       createdAt: createdAt ?? this.createdAt,

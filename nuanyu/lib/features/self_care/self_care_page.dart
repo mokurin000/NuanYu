@@ -1,17 +1,49 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/date_utils.dart' as du;
 import '../../core/widgets/warm_card.dart';
 import '../../core/widgets/empty_state.dart';
 import 'providers/self_care_provider.dart';
 import 'daily_affirmation.dart';
 
-class SelfCarePage extends ConsumerWidget {
+class SelfCarePage extends ConsumerStatefulWidget {
   const SelfCarePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SelfCarePage> createState() => _SelfCarePageState();
+}
+
+class _SelfCarePageState extends ConsumerState<SelfCarePage> {
+  Timer? _dateTimer;
+  String _lastDate = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _lastDate = du.formatDate(DateTime.now());
+    // Check every second whether the date rolled over.
+    _dateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final today = du.formatDate(DateTime.now());
+      if (today != _lastDate) {
+        _lastDate = today;
+        // The completed getter on SelfCareItem is date-dependent,
+        // so reloading items is enough to reflect the new day.
+        ref.read(selfCareProvider.notifier).loadItems();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _dateTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(selfCareProvider);
     final items = state.items;
 

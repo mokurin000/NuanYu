@@ -34,7 +34,11 @@ class DatabaseHelper {
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Migration skeleton — add migration logic here for future versions
+    if (oldVersion < 2) {
+      // v1 -> v2: removed is_completed_today column; last_completed_date is authoritative
+      await db.execute('DROP TABLE IF EXISTS ${DatabaseTables.tableSelfCareItems}');
+      await db.execute(DatabaseTables.createSelfCareItems);
+    }
   }
 
   Future<void> close() async {
@@ -45,3 +49,4 @@ class DatabaseHelper {
     }
   }
 }
+

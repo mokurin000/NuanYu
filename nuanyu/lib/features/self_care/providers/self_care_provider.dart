@@ -65,10 +65,7 @@ class SelfCareNotifier extends Notifier<SelfCareState> {
       if (state.items.isEmpty) {
         await _seedDefaults();
       }
-      await _repository.resetDailyCompletions();
-      await loadItems();
     } catch (e) {
-      // Fall back to empty state on error
       state = state.copyWith(isLoading: false);
     }
   }
